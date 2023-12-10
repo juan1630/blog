@@ -1,0 +1,18 @@
+version: '3'
+
+
+services:
+  db:
+    container_name: blog-db
+    image: mariadb:10.11.6
+    volumes:
+      - blog-vol:/var/lib/mysql
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+volumes:
+  blog-vol:
+    external: false
