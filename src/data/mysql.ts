@@ -1,4 +1,5 @@
 import Mysql2 from "mysql2/promise";
+import bluebird from 'bluebird'
 
 interface DataToConnect {
   host: string;
@@ -31,9 +32,11 @@ export class ConnectMysql {
             host:this.host,
             database: this.dataBase,
             password: this.password,
-            user: this.user
+            user: this.user,
+            Promise: bluebird
         });
 
+        return this.connection;
     } catch (error) {
       console.log(error);
     }
