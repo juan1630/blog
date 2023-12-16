@@ -14,8 +14,8 @@ export class AuthController {
         resp.json('register user controller')
     }
 
-    loginUser = (req: Request, resp: Response) => {
-        
+    loginUser = (request: Request, response: Response) => {
+        return response.send('from controller file');
     }
 
 }
