@@ -47,12 +47,15 @@ export class UserMysql {
     }
   }
 
-  async getUsers() {
+  async createLogin( user:User ) {
     try {
-      await this.connect();
+      
+      const { email, password } = user;
 
-      const users = await this.connection.execute("SELECT * FROM users");
-      return users;
+      await this.connect();
+      const users = await this.connection.execute(`SELECT * FROM users WHERE email =  '${email} '` );
+      console.log(users[0])
+      return users[0];
     } catch (error) {
       console.log(error);
       throw error

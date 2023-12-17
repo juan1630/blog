@@ -29,7 +29,10 @@ export class AuthController {
 
   loginUser = async (request: Request, response: Response) => {
     try {
-      const users = await this.connection.getUsers();
+      const { email, password} = request.body;
+
+      const users = await this.connection.createLogin({ email, password });
+      
       return response.status(200).json({ users });
     } catch (error) {
       console.log(error);
