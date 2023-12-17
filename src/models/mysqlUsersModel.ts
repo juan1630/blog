@@ -1,11 +1,7 @@
 import { envs } from "../config";
 import { ConnectMysql } from "../data";
+import { User } from "../interfaces";
 
-interface User {
-  name: string;
-  email: string;
-  password: string;
-}
 
 export class UserMysql {
   private connection: any;
