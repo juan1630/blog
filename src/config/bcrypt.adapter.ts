@@ -11,7 +11,7 @@ export class Bcrypt {
         this.salt = salt;
     }
 
-    async encryptPassword(): Promise<string>{
+    public async encryptPassword(): Promise<string>{
         try {
 
             return await bcrypt.hashSync(this.password, this.salt );
@@ -20,6 +20,19 @@ export class Bcrypt {
             console.log(error);
             return `Error ${error}` 
         }
+    }
+
+    public async compare(passwordHashed:string) : Promise<boolean> {
+
+        try {
+            
+            return await bcrypt.compareSync(this.password, passwordHashed);
+
+        } catch (error) {
+            console.log(error);
+            return false;
+        }
+
     }
     
 }

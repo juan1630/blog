@@ -1,14 +1,15 @@
-import { envs ,Bcrypt} from "../config";
+import { envs ,Bcrypt, Jwt} from "../config";
 import { ConnectMysql } from "../data";
 import { User } from "../interfaces";
 
 interface ReponseCreate {
-  error: undefined | unknown;
+  error: null | unknown;
   result: boolean;
-  insertId: string | undefined;
+  token: string | null;
 }
 
 export class UserMysql {
+
   private connection: any;
 
   constructor() {}
@@ -27,7 +28,7 @@ export class UserMysql {
     }
   }
 
-  async createUser(user: User):Promise <ReponseCreate> {
+  async createUser(user: User):Promise <ReponseCreate | undefined> {
 
     try {
       await this.connect();
@@ -41,24 +42,43 @@ export class UserMysql {
         `INSERT INTO users ( name, email, password ) VALUES  ( ?, ? , ? );`,
         [name, email, passwordHashed]
       );
-  
-      return {error: undefined, insertId: rows.insertId, result:true }; 
+
+      console.log(rows,"rows")
+      if( rows.insertId > 0  ){
+
+        const token = await new Jwt({ name, email, _id: rows.insertId }).createToken();
+        return {error: null, token, result:true }; 
+      }  
 
     } catch (error) {
       console.log(error)
-      return { error, insertId: undefined, result: false  }
+     // return { error, token: null, result: false  }
     }
   }
 
-  async login( user:User ) {
+  async login( userBody:User ) {
     try {
       
-      const { email, password } = user;
-
+      const { email, password } = userBody;
       await this.connect();
-      const users = await this.connection.execute(`SELECT * FROM users WHERE email =  '${email} '` );
-      console.log(users[0])
-      return users[0];
+
+      const [ user ] = await this.connection.execute(`SELECT * FROM users WHERE email =  '${email} '` );
+  
+      const bcrypt = new Bcrypt( password, 10 );
+      const passowrdCompared = await bcrypt.compare( user[0].password );
+
+      if( passowrdCompared ){
+        const token = await new Jwt({ _id: user[0].id, email, name: user[0].name }).createToken();
+        return {
+          user: user[0],
+          token
+        };
+      }
+
+      return {
+        user:null,
+        token:null
+      }
     } catch (error) {
       console.log(error);
       throw error

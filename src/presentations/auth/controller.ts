@@ -1,6 +1,5 @@
 import { Request, Response, response } from "express";
 import { UserMysql } from "../../models";
-import { Jwt } from '../../config'
 
 export class AuthController {
   public connection: any;
@@ -12,16 +11,18 @@ export class AuthController {
   registerUser = async (req: Request, resp: Response) => {
     try {
       const { name, email, password } = req.body;
-      const reponseCreatedUser = await this.connection.createUser({ name, email, password });
+      const reponseCreatedUser = await this.connection.createUser({
+        name,
+        email,
+        password,
+      });
 
-  
-      if ( !reponseCreatedUser.result ) {
-        return resp.status(401).json({ ok: false, error: reponseCreatedUser.error });
+      if (!reponseCreatedUser) {
+        return resp
+          .status(401)
+          .json({ ok: false, error: "email or password wrong" });
       }
-
-      const token = await  new Jwt({ name, email, _id: reponseCreatedUser.insertId }).createToken();
-        resp.status(201).json({ token });
-
+      resp.status(201).json({ token: reponseCreatedUser });
     } catch (error) {
       console.log(error);
     }
@@ -29,11 +30,11 @@ export class AuthController {
 
   loginUser = async (request: Request, response: Response) => {
     try {
-      const { email, password} = request.body;
+      const { email, password } = request.body;
 
-      const users = await this.connection.login({ email, password });
-      
-      return response.status(200).json({ users });
+      const { user, token } = await this.connection.login({ email, password });
+
+      return response.status(200).json({ user, token });
     } catch (error) {
       console.log(error);
     }
