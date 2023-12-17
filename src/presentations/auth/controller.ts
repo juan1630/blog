@@ -31,7 +31,7 @@ export class AuthController {
     try {
       const { email, password} = request.body;
 
-      const users = await this.connection.createLogin({ email, password });
+      const users = await this.connection.login({ email, password });
       
       return response.status(200).json({ users });
     } catch (error) {

@@ -1,4 +1,4 @@
-import { envs } from "../config";
+import { envs ,Bcrypt} from "../config";
 import { ConnectMysql } from "../data";
 import { User } from "../interfaces";
 
@@ -33,10 +33,13 @@ export class UserMysql {
       await this.connect();
 
       const { email, name, password } = user;
-  
+      
+      const bcrypt = new Bcrypt( password, 10 );
+      const passwordHashed = await bcrypt.encryptPassword();
+
       const [rows] = await this.connection.execute(
         `INSERT INTO users ( name, email, password ) VALUES  ( ?, ? , ? );`,
-        [name, email, password]
+        [name, email, passwordHashed]
       );
   
       return {error: undefined, insertId: rows.insertId, result:true }; 
@@ -47,7 +50,7 @@ export class UserMysql {
     }
   }
 
-  async createLogin( user:User ) {
+  async login( user:User ) {
     try {
       
       const { email, password } = user;
