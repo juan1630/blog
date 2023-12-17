@@ -35,7 +35,8 @@ export class UserMysql {
       `INSERT INTO users ( name, email, password ) VALUES  ( ?, ? , ? );`,
       [name, email, password]
     );
-    return rows.affectedRows;
+
+    return rows.insertId;
   }
 
   async getUsers() {

@@ -1,5 +1,6 @@
 import { Request, Response, response } from "express";
 import { UserMysql } from "../../models";
+import { Jwt } from '../../config'
 
 export class AuthController {
   public connection: any;
@@ -11,9 +12,10 @@ export class AuthController {
   registerUser = async (req: Request, resp: Response) => {
     try {
       const { name, email, password } = req.body;
-      const userCreated = this.connection.createUser({ name, email, password });
-      if (userCreated) {
-        resp.status(201).json({ user: userCreated });
+      const insertId = this.connection.createUser({ name, email, password });
+      if (insertId) {
+        const token = await  new Jwt({ name, email, _id: insertId }).createToken();
+        resp.status(201).json({ token });
       }
     } catch (error) {
       console.log(error);
