@@ -2,6 +2,11 @@ import { envs } from "../config";
 import { ConnectMysql } from "../data";
 import { User } from "../interfaces";
 
+interface ReponseCreate {
+  error: undefined | unknown;
+  result: boolean;
+  insertId: string | undefined;
+}
 
 export class UserMysql {
   private connection: any;
@@ -22,17 +27,24 @@ export class UserMysql {
     }
   }
 
-  async createUser(user: User) {
-    await this.connect();
+  async createUser(user: User):Promise <ReponseCreate> {
 
-    const { email, name, password } = user;
+    try {
+      await this.connect();
 
-    const [rows] = await this.connection.execute(
-      `INSERT INTO users ( name, email, password ) VALUES  ( ?, ? , ? );`,
-      [name, email, password]
-    );
+      const { email, name, password } = user;
+  
+      const [rows] = await this.connection.execute(
+        `INSERT INTO users ( name, email, password ) VALUES  ( ?, ? , ? );`,
+        [name, email, password]
+      );
+  
+      return {error: undefined, insertId: rows.insertId, result:true }; 
 
-    return rows.insertId;
+    } catch (error) {
+      console.log(error)
+      return { error, insertId: undefined, result: false  }
+    }
   }
 
   async getUsers() {

@@ -12,11 +12,16 @@ export class AuthController {
   registerUser = async (req: Request, resp: Response) => {
     try {
       const { name, email, password } = req.body;
-      const insertId = this.connection.createUser({ name, email, password });
-      if (insertId) {
-        const token = await  new Jwt({ name, email, _id: insertId }).createToken();
-        resp.status(201).json({ token });
+      const reponseCreatedUser = await this.connection.createUser({ name, email, password });
+
+  
+      if ( !reponseCreatedUser.result ) {
+        return resp.status(401).json({ ok: false, error: reponseCreatedUser.error });
       }
+
+      const token = await  new Jwt({ name, email, _id: reponseCreatedUser.insertId }).createToken();
+        resp.status(201).json({ token });
+
     } catch (error) {
       console.log(error);
     }
