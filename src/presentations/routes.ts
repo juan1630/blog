@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { AuthRoutes } from './auth/routes';
-
+import { PostsRouter } from './post/routes'
 
 
 
@@ -13,6 +13,7 @@ export class AppRoutes {
         const router = Router();
 
         router.use('/api/auth/', AuthRoutes.routes);
+        router.use('/api/', PostsRouter.routes );
 
         return router;
     }

@@ -6,3 +6,14 @@ CREATE TABLE `users` (
   PRIMARY KEY (`_id`),
   UNIQUE KEY `email` (`email`)
 );
+
+CREATE TABLE posts (
+	date  DATE DEFAULT (CURRENT_DATE),
+	title varchar(100),
+    post text,
+	idPost  INT NOT NULL AUTO_INCREMENT, 
+	idUser INT,
+    PRIMARY KEY (idPost),
+    CONSTRAINT userId FOREIGN KEY (idUser)
+    REFERENCES users(_id)
+);
